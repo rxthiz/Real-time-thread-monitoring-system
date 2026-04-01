@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Threat Monitoring Login</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body class="auth-page">
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+    <main class="auth-shell">
+      <section class="auth-card">
+        <h1>Realtime Threat Monitoring</h1>
+        <p class="auth-subtitle">Sign in as user or admin to continue.</p>
+        <form id="loginForm" class="auth-form" autocomplete="off">
+          <label class="auth-field" for="roleInput">
+            Role
+            <select id="roleInput" class="auth-select" required>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </label>
+          <label class="auth-field" for="usernameInput">
+            Username
+            <input id="usernameInput" class="auth-input" type="text" placeholder="user" required />
+          </label>
+          <label class="auth-field" for="passwordInput">
+            Password
+            <input id="passwordInput" class="auth-input" type="password" placeholder="Enter password" required />
+          </label>
+          <button id="loginBtn" class="btn" type="submit">Login</button>
+        </form>
+        <p id="loginError" class="auth-error" hidden></p>
+        <p class="auth-help">Default credentials: user/user123 and admin/admin123</p>
+      </section>
+    </main>
+
+    <script src="/static/login.js"></script>
+  </body>
+</html>

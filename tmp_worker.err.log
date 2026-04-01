@@ -1,0 +1,2 @@
+2026-03-27 13:31:46,427 INFO alert_worker alert_worker_started queue=alerts:queue dlq=alerts:dlq max_retries=3
+2026-03-27 13:31:58,098 INFO services.processing_service alert_processed alert_id=ALT-360B4710A5A34DB1A81A db_row_id=1 zone=zone:e2e severity=HIGH confidence=0.95 ms=115.62

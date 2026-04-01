@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Threat Monitoring Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>Realtime Threat Monitoring</h1>
+          <p class="subtitle">Live feed, detections, alerts, and response map intelligence</p>
+        </div>
+        <div class="topbar-actions">
+          <span id="connectionBadge" class="pill badge-offline">Disconnected</span>
+          <span id="authRoleBadge" class="pill role-pill">Role: -</span>
+          <span id="authUserBadge" class="pill user-pill">User: -</span>
+          <button id="logoutBtn" class="btn subtle" type="button">Logout</button>
+          <button id="liveCameraBtn" class="btn" data-admin-only="true">Open Live Camera</button>
+          <button id="reconnectBtn" class="btn">Reconnect</button>
+          <button id="clearDetectionsBtn" class="btn subtle" data-admin-only="true">Clear Detections</button>
+          <button id="clearAlertsBtn" class="btn subtle" data-admin-only="true">Clear Alerts</button>
+        </div>
+      </header>
+
+      <nav class="tab-strip" aria-label="Dashboard Tabs">
+        <button id="tabMonitorBtn" class="tab-btn tab-active" type="button">Monitoring</button>
+        <button id="tabMapBtn" class="tab-btn" type="button">Realtime Map</button>
+        <button id="tabIncidentBtn" class="tab-btn" type="button">Incident Timeline</button>
+        <button id="tabAnalyticsBtn" class="tab-btn" type="button">Shift Analytics</button>
+      </nav>
+
+      <section id="monitorTab" class="tab-content">
+        <main class="grid">
+          <section class="panel feed-panel">
+            <div class="panel-head">
+              <h2>Live Feed</h2>
+              <span id="frameMeta" class="mono muted">Waiting for frames...</span>
+            </div>
+            <div class="feed-wrap" id="feedWrap">
+              <img id="feedImage" alt="Live camera stream" />
+              <canvas id="overlayCanvas" aria-hidden="true"></canvas>
+            </div>
+          </section>
+
+          <section class="panel status-panel">
+            <div class="panel-head">
+              <h2>Runtime Status</h2>
+            </div>
+            <div class="metric-grid">
+              <article class="metric">
+                <span>Source</span>
+                <strong id="statusSource">-</strong>
+              </article>
+              <article class="metric">
+                <span>FPS</span>
+                <strong id="statusFps">0</strong>
+              </article>
+              <article class="metric">
+                <span>Resolution</span>
+                <strong id="statusResolution">-</strong>
+              </article>
+              <article class="metric">
+                <span>Action Model</span>
+                <strong id="statusAction">-</strong>
+              </article>
+            </div>
+            <div class="zone-policy-box">
+              <span id="zonePolicyMeta" class="mono muted">Zone: - | Hour: -</span>
+              <span id="zonePolicyCurrent" class="mono muted">Threshold: - | Snooze: -</span>
+              <div class="zone-policy-actions">
+                <label class="zone-policy-field" for="zoneThresholdInput">
+                  Threshold
+                  <input
+                    id="zoneThresholdInput"
+                    class="zone-policy-input"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="1"
+                    placeholder="0.20"
+                  />
+                </label>
+                <label class="zone-policy-field" for="zoneSnoozeInput">
+                  Snooze Min
+                  <input
+                    id="zoneSnoozeInput"
+                    class="zone-policy-input"
+                    type="number"
+                    step="1"
+                    min="0"
+                    max="720"
+                    placeholder="30"
+                  />
+                </label>
+                <button id="zonePolicyApplyBtn" class="btn subtle" data-admin-only="true" type="button">
+                  Apply Zone Policy
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel severity-panel">
+            <div class="panel-head">
+              <h2>Severity Counters</h2>
+            </div>
+            <div class="severity-grid">
+              <article class="sev sev-high">
+                <span>HIGH</span>
+                <strong id="countHigh">0</strong>
+              </article>
+              <article class="sev sev-medium">
+                <span>MEDIUM</span>
+                <strong id="countMedium">0</strong>
+              </article>
+              <article class="sev sev-low">
+                <span>LOW</span>
+                <strong id="countLow">0</strong>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel detections-panel">
+            <div class="panel-head">
+              <h2>Live Detections</h2>
+              <span class="mono muted" id="detectionCount">0 records</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Weapon</th>
+                    <th>Threat ID</th>
+                    <th>Confidence</th>
+                    <th>Severity</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="detectionsBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel alerts-panel">
+            <div class="panel-head">
+              <h2>Alert History</h2>
+              <span class="mono muted" id="alertCount">0 alerts</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Alert ID</th>
+                    <th>Threat ID</th>
+                    <th>Time</th>
+                    <th>Level</th>
+                    <th>Weapon</th>
+                    <th>Score</th>
+                    <th>Reason</th>
+                    <th>Disposition</th>
+                  </tr>
+                </thead>
+                <tbody id="alertsBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel activity-panel">
+            <div class="panel-head">
+              <h2>Activity Log</h2>
+            </div>
+            <ul id="activityLog" class="activity-list"></ul>
+          </section>
+        </main>
+      </section>
+
+      <section id="mapTab" class="tab-content" hidden>
+        <div class="map-grid">
+          <section class="panel map-main-panel">
+            <div class="panel-head">
+              <h2>Realtime Response Map</h2>
+              <span id="mapStatus" class="mono muted">Waiting for location...</span>
+            </div>
+            <div class="map-toolbar">
+              <button id="useMyLocationBtn" class="btn" type="button">Use Camera Location</button>
+              <button id="refreshMapBtn" class="btn subtle" type="button">Refresh</button>
+              <label class="map-field" for="mapRadiusSelect">
+                Radius
+                <select id="mapRadiusSelect" class="map-select">
+                  <option value="2">2 km</option>
+                  <option value="5" selected>5 km</option>
+                  <option value="10">10 km</option>
+                </select>
+              </label>
+              <label class="map-field" for="cameraLatInput">
+                Latitude
+                <input id="cameraLatInput" class="map-input" type="number" step="any" placeholder="12.9716" />
+              </label>
+              <label class="map-field" for="cameraLonInput">
+                Longitude
+                <input id="cameraLonInput" class="map-input" type="number" step="any" placeholder="77.5946" />
+              </label>
+              <button id="applyCoordinatesBtn" class="btn subtle" type="button">Set Coordinates</button>
+            </div>
+            <span id="cameraLocationText" class="mono muted map-location">Camera location: -</span>
+            <div id="mapView" class="map-view" aria-label="Map showing camera, hospitals, police stations and fire stations"></div>
+          </section>
+
+          <section class="panel map-side-panel">
+            <div class="panel-head">
+              <h2>Nearby Services</h2>
+              <span id="mapTotalCount" class="mono muted">0 places</span>
+            </div>
+            <div class="map-count-grid">
+              <article class="map-count-card hospitals">
+                <span>Hospitals</span>
+                <strong id="hospitalCount">0</strong>
+              </article>
+              <article class="map-count-card police">
+                <span>Police</span>
+                <strong id="policeCount">0</strong>
+              </article>
+              <article class="map-count-card fire">
+                <span>Fire</span>
+                <strong id="fireCount">0</strong>
+              </article>
+            </div>
+            <div class="service-block">
+              <h3>Hospitals</h3>
+              <ul id="hospitalList" class="service-list"></ul>
+            </div>
+            <div class="service-block">
+              <h3>Police Stations</h3>
+              <ul id="policeList" class="service-list"></ul>
+            </div>
+            <div class="service-block">
+              <h3>Fire Stations</h3>
+              <ul id="fireList" class="service-list"></ul>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="incidentTab" class="tab-content" hidden>
+        <div class="incident-grid">
+          <section class="panel incident-main-panel">
+            <div class="panel-head">
+              <h2>Incident Timeline</h2>
+              <span id="incidentSummaryText" class="mono muted">Load an incident to reconstruct timeline</span>
+            </div>
+            <div class="incident-toolbar">
+              <label class="incident-field" for="incidentIdInput">
+                Incident ID
+                <input
+                  id="incidentIdInput"
+                  class="incident-input"
+                  type="text"
+                  placeholder="THR-... or ALT-..."
+                  autocomplete="off"
+                />
+              </label>
+              <button id="loadIncidentBtn" class="btn" type="button">Load Timeline</button>
+              <button id="exportIncidentPdfBtn" class="btn subtle" type="button">Export PDF</button>
+            </div>
+            <div class="table-wrap incident-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Category</th>
+                    <th>Source</th>
+                    <th>Actor</th>
+                    <th>Title</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody id="incidentTimelineBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel incident-side-panel">
+            <div class="panel-head">
+              <h2>Dispatch & Notes</h2>
+            </div>
+            <form id="incidentEventForm" class="incident-form" autocomplete="off">
+              <label class="incident-field" for="incidentEventTypeSelect">
+                Event Type
+                <select id="incidentEventTypeSelect" class="incident-select">
+                  <option value="SOS_TRIGGERED">SOS Triggered</option>
+                  <option value="POLICE_DISPATCHED">Police Dispatched</option>
+                  <option value="OFFICER_DISPATCHED">Officer Dispatched</option>
+                  <option value="OFFICER_ARRIVED">Officer Arrived</option>
+                  <option value="SCENE_CLEARED">Scene Cleared</option>
+                  <option value="MANUAL_NOTE">Manual Note</option>
+                </select>
+              </label>
+              <label class="incident-field" for="incidentEventSourceInput">
+                Source
+                <input id="incidentEventSourceInput" class="incident-input" type="text" placeholder="camera:3" />
+              </label>
+              <label class="incident-field" for="incidentUnitInput">
+                Unit ID
+                <input id="incidentUnitInput" class="incident-input" type="text" placeholder="PATROL-12" />
+              </label>
+              <label class="incident-field" for="incidentOfficerInput">
+                Officer ID
+                <input id="incidentOfficerInput" class="incident-input" type="text" placeholder="OFFICER-42" />
+              </label>
+              <label class="incident-field" for="incidentEtaInput">
+                ETA Minutes
+                <input id="incidentEtaInput" class="incident-input" type="number" min="0" step="1" placeholder="8" />
+              </label>
+              <label class="incident-field" for="incidentNoteInput">
+                Note
+                <textarea id="incidentNoteInput" class="incident-textarea" rows="4" placeholder="Situation details..."></textarea>
+              </label>
+              <button id="incidentEventSubmitBtn" class="btn subtle" type="submit">
+                Add Incident Event
+              </button>
+            </form>
+            <div class="incident-escalation-block">
+              <div class="panel-head compact">
+                <h3>Escalation Chain</h3>
+                <span id="escalationStatusText" class="mono muted">No escalation loaded</span>
+              </div>
+              <div class="incident-toolbar">
+                <button id="startEscalationBtn" class="btn subtle" type="button">Start Escalation</button>
+                <button id="ackEscalationBtn" class="btn subtle" type="button">Acknowledge Escalation</button>
+                <button id="refreshEscalationBtn" class="btn subtle" type="button">Refresh Status</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Step</th>
+                      <th>Delay</th>
+                      <th>Triggered</th>
+                      <th>Delivery</th>
+                    </tr>
+                  </thead>
+                  <tbody id="escalationStatusBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="analyticsTab" class="tab-content" hidden>
+        <div class="analytics-grid">
+          <section class="panel analytics-main-panel">
+            <div class="panel-head">
+              <h2>Shift Analytics</h2>
+              <span id="analyticsSummaryText" class="mono muted">Load analytics window</span>
+            </div>
+            <div class="analytics-toolbar">
+              <label class="analytics-field" for="analyticsFromInput">
+                From (Local)
+                <input id="analyticsFromInput" class="analytics-input" type="datetime-local" />
+              </label>
+              <label class="analytics-field" for="analyticsToInput">
+                To (Local)
+                <input id="analyticsToInput" class="analytics-input" type="datetime-local" />
+              </label>
+              <label class="analytics-field" for="analyticsZoneInput">
+                Zone
+                <input id="analyticsZoneInput" class="analytics-input" type="text" placeholder="camera:3 (optional)" />
+              </label>
+              <label class="analytics-field" for="analyticsHourStartInput">
+                Hour Start
+                <input id="analyticsHourStartInput" class="analytics-input small" type="number" min="0" max="23" step="1" placeholder="22" />
+              </label>
+              <label class="analytics-field" for="analyticsHourEndInput">
+                Hour End
+                <input id="analyticsHourEndInput" class="analytics-input small" type="number" min="0" max="23" step="1" placeholder="2" />
+              </label>
+              <button id="loadAnalyticsBtn" class="btn" type="button">Load Analytics</button>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Incidents By Shift</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Shift</th>
+                      <th>Window</th>
+                      <th>Incidents</th>
+                      <th>%</th>
+                    </tr>
+                  </thead>
+                  <tbody id="shiftAnalyticsBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Operator Response</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Operator</th>
+                      <th>Handled</th>
+                      <th>Avg (s)</th>
+                      <th>P50 (s)</th>
+                      <th>Min/Max (s)</th>
+                      <th>Ack/Esc/Dismiss</th>
+                    </tr>
+                  </thead>
+                  <tbody id="operatorAnalyticsBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel analytics-side-panel">
+            <div class="panel-head">
+              <h2>Zone Risk & Heatmap</h2>
+            </div>
+            <div class="analytics-section">
+              <h3>Zone Risk Ranking</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Zone</th>
+                      <th>Incidents</th>
+                    </tr>
+                  </thead>
+                  <tbody id="zoneRiskBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="analytics-section">
+              <div class="analytics-toolbar compact">
+                <label class="analytics-field" for="heatmapZoneSelect">
+                  Heatmap Zone
+                  <select id="heatmapZoneSelect" class="analytics-select"></select>
+                </label>
+                <button id="refreshHeatmapBtn" class="btn subtle" type="button">Refresh Heatmap</button>
+              </div>
+              <div id="heatmapGrid" class="heatmap-grid"></div>
+            </div>
+            <div class="analytics-section">
+              <h3>Shift Windows</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Start</th>
+                      <th>End</th>
+                    </tr>
+                  </thead>
+                  <tbody id="shiftWindowBody"></tbody>
+                </table>
+              </div>
+              <button id="saveShiftWindowsBtn" class="btn subtle" data-admin-only="true" type="button">Save Shift Windows</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/dashboard.js"></script>
+  </body>
+</html>

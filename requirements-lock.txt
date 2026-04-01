@@ -1,0 +1,14 @@
+fastapi==0.135.2
+uvicorn[standard]==0.42.0
+sqlalchemy[asyncio]==2.0.48
+asyncpg==0.31.0
+redis==7.4.0
+pydantic==2.12.5
+alembic==1.18.4
+python-dotenv==1.2.2
+numpy==2.4.3
+opencv-python==4.13.0.92
+rich==14.3.3
+torch==2.11.0
+torchvision==0.26.0
+ultralytics==8.4.30

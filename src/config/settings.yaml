@@ -1,0 +1,341 @@
+weapon:
+  model_family: "yolo_world"
+  yolo_weights: "yolov8m-worldv2.pt"
+  confidence_threshold: 0.12
+  imgsz: 1024
+  iou_threshold: 0.50
+  max_detections: 80
+  augment_inference: false
+  device: 0
+  class_prompts:
+    - gun
+    - handgun
+    - pistol
+    - rifle
+    - shotgun
+    - knife
+    - dagger
+    - machete
+    - metal pipe
+    - plastic pipe
+    - pvc pipe
+    - iron rod
+    - wooden stick
+    - baseball bat
+    - crowbar
+    - lathi
+    - club
+  class_thresholds:
+    gun: 0.12
+    knife: 0.12
+    stick: 0.10
+  allowed_classes:
+    - gun
+    - knife
+    - stick
+  class_aliases:
+    gun: gun
+    handgun: gun
+    pistol: gun
+    revolver: gun
+    rifle: gun
+    shotgun: gun
+    knife: knife
+    dagger: knife
+    machete: knife
+    sword: knife
+    metal pipe: stick
+    plastic pipe: stick
+    pvc pipe: stick
+    iron rod: stick
+    wooden stick: stick
+    crowbar: stick
+    lathi: stick
+    club: stick
+    rod: stick
+    pipe: stick
+    baseball bat: stick
+    bat: stick
+    hockey stick: stick
+    umbrella: stick
+
+action:
+  enabled: true
+  async_inference: true
+  infer_every_n_processed_frames: 15
+  swin_config: ".venv/Lib/site-packages/mmaction/.mim/configs/recognition/swin/swin-tiny-p244-w877_in1k-pre_8xb8-amp-32x2x1-30e_kinetics400-rgb.py"
+  swin_checkpoint: "models/video_swin_checkpoint.pth"
+  clip_len: 16
+  frame_interval: 2
+  inference_clip_fps: 15
+  top_k: 1
+
+pipeline:
+  process_every_n_frames: 2
+  min_alert_gap_seconds: 2.0
+  show_progress: true
+  progress_every_n_frames: 60
+  live_view: true
+  window_name: "Threat Monitor"
+
+fusion:
+  weapon_weights:
+    gun: 0.85
+    knife: 0.65
+    stick: 0.55
+  action_weights:
+    aiming: 0.95
+    stabbing: 0.95
+    swinging: 0.70
+    threatening: 0.75
+    running: 0.30
+    standing: 0.10
+  high_severity_threshold: 0.80
+  medium_severity_threshold: 0.55
+  weapon_only_rules:
+    enabled: true
+    medium_conf_thresholds:
+      gun: 0.25
+      knife: 0.30
+      stick: 0.20
+    high_conf_thresholds:
+      gun: 0.70
+      knife: 0.80
+      stick: 0.75
+
+alerts:
+  output_jsonl: "data/alerts.jsonl"
+  console: true
+
+evidence:
+  enabled: true
+  output_dir: "data/evidence"
+  pre_event_seconds: 10
+  post_event_seconds: 10
+  watermark_timestamp: true
+
+xai:
+  enabled: true
+  persistence_window_seconds: 20
+  persistent_detection_threshold: 3
+  max_feature_count: 5
+
+adaptive_alerting:
+  enabled: true
+  base_confidence_threshold: 0.12
+  min_confidence_threshold: 0.08
+  max_confidence_threshold: 0.95
+  threshold_step: 0.05
+  dismiss_trigger_count: 10
+  snooze_minutes: 30
+  policy_cache_ttl_seconds: 10
+
+reid:
+  enabled: true
+  backend: "auto"
+  model_name: "osnet_x1_0"
+  weights_path: ""
+  device: "cpu"
+  similarity_threshold: 0.70
+  temporal_window_seconds: 60
+  track_retention_seconds: 120
+  max_tracks: 2000
+  max_events_per_track: 120
+  max_embeddings_per_track: 12
+  max_path_points: 160
+  track_path_preview_points: 24
+  target_labels: []
+  embedding_cache_size: 512
+  input_width: 128
+  input_height: 256
+  min_crop_side: 18
+  same_zone_bonus: 0.04
+  same_camera_bonus: 0.025
+  adjacent_zone_bonus: 0.015
+  prune_interval_seconds: 8
+
+predictive:
+  enabled: true
+  analysis_window_seconds: 180
+  update_interval_seconds: 0.35
+  track_retention_seconds: 180
+  smoothing_window: 6
+  loitering_seconds: 90
+  transition_window_seconds: 120
+  transition_count_threshold: 4
+  pacing_switch_threshold: 3
+  circular_close_ratio: 0.35
+  min_circular_distance: 0.85
+  speed_threshold: 0.55
+  acceleration_threshold: 0.65
+  medium_risk_threshold: 0.45
+  high_risk_threshold: 0.70
+  pre_alert_threshold: 0.85
+  pre_alert_clear_threshold: 0.58
+  restricted_zones: []
+  zone_weights: {}
+  target_labels: []
+  weights:
+    loitering: 0.30
+    movement: 0.25
+    transitions: 0.20
+    speed: 0.10
+    zone_sensitivity: 0.15
+    anomaly: 0.20
+  anomaly_detection:
+    enabled: true
+    backend: "isolation_forest" # isolation_forest | statistical
+    min_samples: 64
+    max_samples: 400
+    fit_interval: 30
+    contamination: 0.08
+    anomaly_threshold: 0.72
+    random_state: 42
+
+behavior_memory:
+  enabled: true
+  history_limit: 50
+  zone_history_limit: 50
+  visit_history_limit: 24
+  visit_gap_seconds: 45
+  frequent_visit_threshold: 5
+  loitering_seconds: 90
+  risk_escalation_window: 5
+  risk_escalation_delta: 0.18
+  zone_hopping_threshold: 2
+  high_risk_threshold: 0.78
+  alert_escalation_threshold: 0.82
+  archive_after_days: 30
+  archive_prune_interval_seconds: 3600
+  risk_formula:
+    avg_weight: 0.5
+    max_weight: 0.3
+    flag_weight: 0.2
+    flag_weights:
+      frequent_visitor: 0.45
+      risk_escalation: 0.65
+      loitering: 0.55
+      zone_hopping: 0.4
+      repeated_zone_transitions: 0.35
+      pacing: 0.25
+      circular_movement: 0.25
+      sudden_speed: 0.3
+      restricted_zone: 0.45
+
+false_positive_filter:
+  enabled: true
+  smoothing_window: 5
+  min_frames: 5
+  temporal_reset_seconds: 8
+  rule_score_weight: 0.6
+  ml_probability_weight: 0.4
+  fail_safe_confidence: 0.9
+  fail_safe_severity: "CRITICAL"
+  min_feedback_samples: 8
+  learning_rate: 0.25
+  training_epochs: 180
+  l2_penalty: 0.01
+  hard_negative_weight: 1.8
+  hard_negative_threshold: 0.7
+  zone_thresholds:
+    high_risk:
+      accept: 0.6
+      uncertain: 0.4
+    public:
+      accept: 0.7
+      uncertain: 0.4
+    low_risk:
+      accept: 0.8
+      uncertain: 0.55
+  zone_types:
+    zone:default: public
+    camera:0: public
+  high_risk_zones: []
+  low_risk_zones: []
+
+escalation:
+  enabled: true
+  auto_start_on_sos: true
+  poll_interval_seconds: 1.0
+  delivery:
+    timeout_seconds: 4.0
+    webhook_url: ""
+    sms_webhook_url: ""
+    push_webhook_url: ""
+
+sos:
+  enabled: true
+  radius_km: 10
+  simulation_mode: true
+  auto_min_confidence: 0.85
+  auto_required_severity: "CRITICAL"
+  zone_cooldown_seconds: 60
+  retry_limit: 3
+  duplicate_window_seconds: 60
+  global_alert_limit_per_minute: 120
+  zone_alert_limit_per_minute: 10
+  global_pause_seconds: 30
+  service_stale_after_seconds: 900
+  dispatch_timeout_seconds: 20
+  pending_retry_seconds: 10
+  live_link: "http://localhost:8000/zone-map-dashboard"
+  control_phone: "+910000000000"
+  sms:
+    webhook_url: ""
+    timeout_seconds: 5.0
+    max_retries: 3
+    retry_delay_seconds: 2.0
+    simulation_mode: true
+
+sos:
+  radius_km: 10
+  retry_limit: 3
+  dispatch_timeout_seconds: 20
+  pending_retry_seconds: 10
+  service_stale_after_seconds: 900
+  zone_alert_limit_per_minute: 10
+  global_alert_limit_per_minute: 120
+  global_pause_seconds: 30
+  duplicate_window_seconds: 60
+  zone_cooldown_seconds: 60
+  auto_min_confidence: 0.85
+  auto_required_severity: "CRITICAL"
+  zone_auto_thresholds:
+    zone:default: 0.85
+    camera:0: 0.85
+  live_link: "http://localhost:8000/zone-map-dashboard"
+  control_phone: "+910000000000"
+  email_webhook_url: ""
+  push_webhook_url: ""
+  webhook_url: ""
+  routing:
+    traffic_profile: "city"
+    road_network_factor: 1.12
+    base_speed_kmph:
+      police: 50
+      hospital: 42
+      fire: 45
+  sms:
+    provider: "webhook" # webhook | twilio
+    simulation_mode: true
+    webhook_url: ""
+    timeout_seconds: 5.0
+    max_retries: 3
+    retry_delay_seconds: 2.0
+    twilio_account_sid: ""
+    twilio_auth_token: ""
+    twilio_from_number: ""
+    twilio_messaging_service_sid: ""
+  zone_locations:
+    zone:default:
+      lat: 12.9716
+      lng: 77.5946
+    camera:0:
+      lat: 12.9716
+      lng: 77.5946
+
+edge:
+  enabled: false
+  max_fps: 12
+  input_scale: 0.75
+  prefer_cpu: true

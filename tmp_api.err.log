@@ -1,0 +1,16 @@
+INFO:     Started server process [15016]
+INFO:     Waiting for application startup.
+WARNING:src.models.weapon_detector:Requested GPU index 0, but CUDA is unavailable. Falling back to CPU.
+INFO:src.models.weapon_detector:WeaponDetector initialized with device=cpu
+INFO:src.reid.embedding_model:Loaded torchvision ReID backbone backend=torchvision:resnet50:random
+WARNING:api.realtime_engine:Action recognizer unavailable, disabling action inference: MMAction2 is required for Video Swin action recognition. Install with: pip install mmaction2 mmengine mmcv-lite
+INFO:api.realtime_engine:Realtime threat engine started with source=C:\Users\rushr\OneDrive\Desktop\project1\data\sample.mp4
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:src.predictive.profile_memory:{"event": "TRACK_UPDATED", "timestamp": "2026-03-27T08:01:58.788488+00:00", "track_id": "THR-F0EE5603597842D7", "zone_key": "zone:default", "risk_score": 0.132, "flags": ["restricted_zone"], "behavior_risk": 0.1956, "visit_count": 1}
+INFO:api.realtime_engine:{"event": "FP_FILTER", "type": "FILTER_DECISION", "message": "False-positive filter decision=uncertain", "timestamp": "2026-03-27T08:01:58.828852+00:00", "alert_id": "ALT-47DDC87E6F2B41719A30", "probability": 0.8876, "decision": "uncertain"}
+INFO:src.predictive.profile_memory:{"event": "TRACK_UPDATED", "timestamp": "2026-03-27T08:02:00.097177+00:00", "track_id": "THR-F0EE5603597842D7", "zone_key": "zone:default", "risk_score": 0.1348, "flags": ["restricted_zone"], "behavior_risk": 0.1971, "visit_count": 1}
+INFO:api.realtime_engine:Alert suppressed source=C:\Users\rushr\OneDrive\Desktop\project1\data\sample.mp4 zone=zone:default hour=8 conf=0.393 reason=min_alert_gap
+INFO:src.predictive.profile_memory:{"event": "TRACK_UPDATED", "timestamp": "2026-03-27T08:02:01.125603+00:00", "track_id": "THR-F0EE5603597842D7", "zone_key": "zone:default", "risk_score": 0.1372, "flags": ["restricted_zone"], "behavior_risk": 0.1985, "visit_count": 1}
+INFO:api.realtime_engine:{"event": "INFO", "type": "DUPLICATE_ALERT", "message": "Alert ignored for zone=zone:default severity=MEDIUM", "timestamp": "2026-03-27T08:02:01.125603+00:00", "zone_key": "zone:default", "severity": "MEDIUM"}
+INFO:api.realtime_engine:Alert suppressed source=C:\Users\rushr\OneDrive\Desktop\project1\data\sample.mp4 zone=zone:default hour=8 conf=0.524 reason=duplicate_alert

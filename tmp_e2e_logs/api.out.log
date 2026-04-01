@@ -1,0 +1,91 @@
+INFO:     127.0.0.1:59036 - "GET /api/v3/ops/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /api/v3/ops/metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59056 - "POST /api/v3/alerts HTTP/1.1" 200 OK
+ALERT MEDIUM ALT-10C002F9E94B47FA8547 {'timestamp_sec': 2.0, 'weapon': 'gun', 
+'action': 'unknown', 'score': 0.55, 'level': 'MEDIUM', 'reason': 'weapon-only 
+rule: gun confidence 0.49 >= 0.25', 'explanation': {'reason': 'Gun detected 
+with low confidence', 'summary': 'Medium risk alert triggered in zone:default 
+due to gun detected with low confidence.', 'factors': [{'name': 'object_type', 
+'value': 'gun', 'impact': 0.2713}, {'name': 'confidence', 'value': 0.4911, 
+'impact': 0.1473}], 'model_breakdown': {'weapon_model_confidence': 0.4911, 
+'action_model_confidence': 0.0, 'ml_filter_score': 0.55}, 'feature_importance':
+[{'feature': 'object_type=gun', 'importance': 0.6481}, {'feature': 
+'confidence=0.4911', 'importance': 0.3519}], 'final_score': 0.55, 'severity': 
+'MEDIUM', 'rule_reason': 'weapon-only rule: gun confidence 0.49 >= 0.25', 
+'behavior_context': {'track_id': 'THR-D45135083BA7449D', 'current_risk': 0.55, 
+'behavior_risk': 0.1956, 'avg_risk': 0.132, 'max_risk': 0.132, 'flags': 
+['restricted_zone'], 'visits': 1, 'zones': ['zone:default']}, 
+'false_positive_filter': {'decision': 'uncertain', 'threat_probability': 
+0.8876, 'final_score': 0.685, 'reason': 'Temporal persistence below 5 frames. 
+confidence supports threat, severity score supports threat, smoothed score 
+supports threat', 'feature_importance': [{'feature': 'confidence', 
+'importance': 0.2626, 'contribution': 0.884, 'direction': 'positive'}, 
+{'feature': 'severity_score', 'importance': 0.2206, 'contribution': 0.7425, 
+'direction': 'positive'}, {'feature': 'smoothed_score', 'importance': 0.1797, 
+'contribution': 0.605, 'direction': 'positive'}, {'feature': 'object_gun', 
+'importance': 0.1485, 'contribution': 0.5, 'direction': 'positive'}, 
+{'feature': 'persistence_ratio', 'importance': 0.0624, 'contribution': 0.21, 
+'direction': 'positive'}, {'feature': 'behavior_risk', 'importance': 0.0552, 
+'contribution': 0.1858, 'direction': 'positive'}]}}, 'alert_id': 
+'ALT-10C002F9E94B47FA8547', 'timestamp': '2026-03-27T08:04:30.766221+00:00', 
+'source': 'C:\\Users\\rushr\\OneDrive\\Desktop\\project1\\data\\sample.mp4', 
+'threat_id': 'THR-D45135083BA7449D', 'zone_key': 'zone:default', 'hour_of_day':
+8, 'effective_threshold': 0.12, 'frame_id': 2, 'severity': 'MEDIUM', 
+'confidence': 0.4911, 'event': {'weapon': 'gun', 'action': 'unknown', 'score': 
+0.55, 'level': 'MEDIUM', 'reason': 'weapon-only rule: gun confidence 0.49 >= 
+0.25', 'timestamp_sec': 2.0, 'explanation': {'reason': 'Gun detected with low 
+confidence', 'summary': 'Medium risk alert triggered in zone:default due to gun
+detected with low confidence.', 'factors': [{'name': 'object_type', 'value': 
+'gun', 'impact': 0.2713}, {'name': 'confidence', 'value': 0.4911, 'impact': 
+0.1473}], 'model_breakdown': {'weapon_model_confidence': 0.4911, 
+'action_model_confidence': 0.0, 'ml_filter_score': 0.55}, 'feature_importance':
+[{'feature': 'object_type=gun', 'importance': 0.6481}, {'feature': 
+'confidence=0.4911', 'importance': 0.3519}], 'final_score': 0.55, 'severity': 
+'MEDIUM', 'rule_reason': 'weapon-only rule: gun confidence 0.49 >= 0.25', 
+'behavior_context': {'track_id': 'THR-D45135083BA7449D', 'current_risk': 0.55, 
+'behavior_risk': 0.1956, 'avg_risk': 0.132, 'max_risk': 0.132, 'flags': 
+['restricted_zone'], 'visits': 1, 'zones': ['zone:default']}, 
+'false_positive_filter': {'decision': 'uncertain', 'threat_probability': 
+0.8876, 'final_score': 0.685, 'reason': 'Temporal persistence below 5 frames. 
+confidence supports threat, severity score supports threat, smoothed score 
+supports threat', 'feature_importance': [{'feature': 'confidence', 
+'importance': 0.2626, 'contribution': 0.884, 'direction': 'positive'}, 
+{'feature': 'severity_score', 'importance': 0.2206, 'contribution': 0.7425, 
+'direction': 'positive'}, {'feature': 'smoothed_score', 'importance': 0.1797, 
+'contribution': 0.605, 'direction': 'positive'}, {'feature': 'object_gun', 
+'importance': 0.1485, 'contribution': 0.5, 'direction': 'positive'}, 
+{'feature': 'persistence_ratio', 'importance': 0.0624, 'contribution': 0.21, 
+'direction': 'positive'}, {'feature': 'behavior_risk', 'importance': 0.0552, 
+'contribution': 0.1858, 'direction': 'positive'}]}}}, 'top_weapon': 'gun', 
+'behavior_context': {'track_id': 'THR-D45135083BA7449D', 'current_risk': 0.55, 
+'behavior_risk': 0.1956, 'avg_risk': 0.132, 'max_risk': 0.132, 'flags': 
+['restricted_zone'], 'visits': 1, 'zones': ['zone:default']}, 'fp_filter': 
+{'enabled': True, 'classifier': 'custom_logistic_regression', 'trained': False,
+'decision': 'uncertain', 'operator_review_required': True, 'bypassed': False, 
+'reason': 'Temporal persistence below 5 frames. confidence supports threat, 
+severity score supports threat, smoothed score supports threat', 
+'threat_probability': 0.8876, 'final_score': 0.685, 'model_confidence': 0.55, 
+'thresholds': {'accept': 0.7, 'uncertain': 0.4}, 'features': {'confidence': 
+0.4911, 'severity_score': 0.55, 'object': 'gun', 'bbox_area': 0.1417, 
+'motion_intensity': 0.0, 'duration': 1, 'smoothed_score': 0.55, 
+'persistence_ratio': 0.2, 'zone': 'public', 'time': 'day', 'behavior_risk': 
+0.1956}, 'feature_importance': [{'feature': 'confidence', 'importance': 0.2626,
+'contribution': 0.884, 'direction': 'positive'}, {'feature': 'severity_score', 
+'importance': 0.2206, 'contribution': 0.7425, 'direction': 'positive'}, 
+{'feature': 'smoothed_score', 'importance': 0.1797, 'contribution': 0.605, 
+'direction': 'positive'}, {'feature': 'object_gun', 'importance': 0.1485, 
+'contribution': 0.5, 'direction': 'positive'}, {'feature': 'persistence_ratio',
+'importance': 0.0624, 'contribution': 0.21, 'direction': 'positive'}, 
+{'feature': 'behavior_risk', 'importance': 0.0552, 'contribution': 0.1858, 
+'direction': 'positive'}], 'alert_id': 'ALT-10C002F9E94B47FA8547'}, 
+'threat_probability': 0.8876, 'alert_type': 'OPERATOR_REVIEW_ALERT', 
+'evidence_status': 'not_requested', 'evidence_clip_path': None, 
+'clip_duration': None, 'frame_count': None, 'evidence_error': None, 
+'evidence_created_at': None, 'evidence_thumbnail_path': None, 
+'evidence_sha256': None, 'evidence_clip_name': None, 
+'evidence_logical_filename': None, 'evidence_clip': {'path': None, 'duration': 
+None, 'frames': None, 'status': 'not_requested', 'created_at': None, 
+'thumbnail_path': None, 'thumbnail_url': None, 'sha256': None, 'clip_name': 
+None, 'logical_filename': None, 'download_url': None, 'error': None}}
+INFO:     127.0.0.1:59848 - "GET /api/v3/ops/metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59850 - "GET /api/v3/alerts/recent?limit=10 HTTP/1.1" 200 OK
